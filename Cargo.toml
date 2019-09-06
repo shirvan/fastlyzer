@@ -1,0 +1,28 @@
+[package]
+name = "fastlyzer"
+version = "0.1.0"
+authors = ["Shirvan Salehipoor <shirvan@edlio.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+failure = "0.1.5"
+structopt = "0.3.0"
+rayon = "1.2.0"
+tabwriter = "1.1.0"
+
+[lib]
+name = "fastlyzer"
+path = "src/lib.rs"
+doctest = false
+test = false
+
+[[bin]]
+name = "fastlyzer"
+path = "src/bin/fastlyzer.rs"
+doctest = false
+test = false
