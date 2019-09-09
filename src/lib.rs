@@ -34,10 +34,10 @@ fn domain_req(logs: &[Entry], max: usize) {
     }
 
     let hits: BTreeMap<usize, Cow<str>> = hits.into_par_iter().map(|(k, v)| (v, k)).collect();
-    write!(&mut tw, "Domain\tHits\tHit Percentage\n").unwrap();
+    writeln!(&mut tw, "Domain\tHits\tHit Percentage").unwrap();
     for (count, domain) in hits.iter().rev().take(max) {
         let percentage = (*count as f32 / total_logs as f32) * 100.0;
-        write!(&mut tw, "{}\t{}\t{:.3}%\n", domain, count, percentage).unwrap();
+        writeln!(&mut tw, "{}\t{}\t{:.3}%", domain, count, percentage).unwrap();
     }
 
     tw.flush().unwrap();
