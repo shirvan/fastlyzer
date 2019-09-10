@@ -1,4 +1,3 @@
-use rayon::prelude::*;
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap};
 use std::io::{self, BufRead, Write};
@@ -15,7 +14,7 @@ pub mod rw;
 pub fn get_domains(reader: Box<dyn BufRead>, max: usize) {
     let lines: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
     let logs: Vec<Entry> = lines
-        .par_iter()
+        .iter()
         .map(|line| serde_json::from_str(line).unwrap())
         .collect();
 
@@ -33,7 +32,7 @@ fn domain_req(logs: &[Entry], max: usize) {
             .or_insert(1);
     }
 
-    let hits: BTreeMap<usize, Cow<str>> = hits.into_par_iter().map(|(k, v)| (v, k)).collect();
+    let hits: BTreeMap<usize, Cow<str>> = hits.into_iter().map(|(k, v)| (v, k)).collect();
     writeln!(&mut tw, "Domain\tHits\tHit Percentage").unwrap();
     for (count, domain) in hits.iter().rev().take(max) {
         let percentage = (*count as f32 / total_logs as f32) * 100.0;
