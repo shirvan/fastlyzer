@@ -25,4 +25,4 @@ impl From<serde_json::Error> for FastlyzerErr {
 }
 
 /// Fastlyzer Result type
-pub type Result<T> = std::result::Result<T, FastlyzerErr>;
+pub type FastResult<T> = std::result::Result<T, FastlyzerErr>;

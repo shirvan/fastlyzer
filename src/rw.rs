@@ -3,9 +3,9 @@ use std::{
     io::{BufRead, BufReader},
     path::Path
 };
-use crate::Result;
+use crate::FastResult;
 
-pub fn read(file: &str) -> Result<Box<dyn BufRead>> {
+pub fn read(file: &str) -> FastResult<Box<dyn BufRead>> {
     let path = Path::new(file);
     let file = OpenOptions::new().read(true).open(&path)?;
     Ok(Box::new(BufReader::new(file)))
