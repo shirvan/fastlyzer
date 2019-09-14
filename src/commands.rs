@@ -1,7 +1,6 @@
 use std::{
     collections::{BTreeMap, HashMap},
     io::{self, BufRead, Write},
-    time::Instant,
 };
 
 use rayon::prelude::*;
@@ -35,11 +34,7 @@ pub fn get_domains(
         }
     };
 
-    let read_start = Instant::now();
     let lines: Vec<_> = reader.lines().map(std::result::Result::unwrap).collect();
-    let read_end = read_start.elapsed().as_millis();
-
-    let grouping_start = Instant::now();
 
     let total_logs = lines.len();
     let mut hits: HashMap<&str, usize> = HashMap::with_capacity(total_logs);
@@ -71,10 +66,6 @@ pub fn get_domains(
                 .or_insert(1);
         });
 
-    let grouping_end = grouping_start.elapsed().as_millis();
-
-    let print_start = Instant::now();
-
     writeln!(&mut tw, "{}\tHits\tHit Percentage", selector).unwrap();
     let hits: BTreeMap<usize, &str> = hits.into_par_iter().map(|(k, v)| (v, k)).collect();
     for (count, field) in hits.iter().rev().take(max) {
@@ -82,11 +73,5 @@ pub fn get_domains(
         writeln!(&mut tw, "{}\t{}\t{:.3}%", field, count, percentage).unwrap();
     }
 
-    let print_end = print_start.elapsed().as_millis();
-
-    writeln!(&mut tw, "{} total logs", total_logs);
-    writeln!(&mut tw, "Reading took {}ms", read_end);
-    writeln!(&mut tw, "Grouping took {}ms", grouping_end);
-    writeln!(&mut tw, "Printing took {}ms", print_end);
     tw.flush().unwrap();
 }
