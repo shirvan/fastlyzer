@@ -1,32 +1,92 @@
-use crate::Entry;
+use std::{
+    collections::{BTreeMap, HashMap},
+    io::{self, BufRead, Write},
+    time::Instant,
+};
 
-pub fn get_domains(reader: Box<dyn BufRead>, max: usize) {
-    let lines: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
-    let logs: Vec<Entry> = lines
-        .iter()
-        .map(|line| serde_json::from_str(line).unwrap())
-        .collect();
+use rayon::prelude::*;
+use tabwriter::TabWriter;
 
-    domain_req(&logs, max)
-}
-
-fn domain_req(logs: &[Entry], max: usize) {
+pub fn get_domains(
+    reader: Box<dyn BufRead>,
+    max: usize,
+    selector: &str,
+    filters: Vec<(&str, &str)>,
+) {
     let mut tw = TabWriter::new(io::stdout());
-    let total_logs = logs.len();
-    // Speed(Matt): We want to be able to sort by size as we insert
-    let mut hits: HashMap<Cow<str>, usize> = HashMap::new();
-    for log in logs.iter() {
-        hits.entry(log.origin_host.clone())
-            .and_modify(|e| *e += 1)
-            .or_insert(1);
-    }
 
-    let hits: BTreeMap<usize, Cow<str>> = hits.into_iter().map(|(k, v)| (v, k)).collect();
-    writeln!(&mut tw, "Domain\tHits\tHit Percentage").unwrap();
-    for (count, domain) in hits.iter().rev().take(max) {
+    // (:?"cache_status":)\s?\"?(.+?)\"?\s?[,}\s]
+    let selector_matcher = {
+        let regex = format!("(:?\"{}\":)\\s?\"?(.+?)\"?\\s?[,}}\\s]", selector);
+        regex::Regex::new(&regex).unwrap()
+    };
+
+    // (:?"cache_status":)\s?"?(:?MISS-CLUSTER)"?\s?[,}\s]
+    let filter_matcher = {
+        let filters: Vec<String> = filters
+            .iter()
+            .map(|(key, value)| format!("(:?\"{}\":)\\s?\"?(:?{})\"?\\s?[,}}\\s]", key, value))
+            .collect();
+
+        if !filters.is_empty() {
+            Some(regex::RegexSet::new(&filters).unwrap())
+        } else {
+            None
+        }
+    };
+
+    let read_start = Instant::now();
+    let lines: Vec<_> = reader.lines().map(std::result::Result::unwrap).collect();
+    let read_end = read_start.elapsed().as_millis();
+
+    let grouping_start = Instant::now();
+
+    let total_logs = lines.len();
+    let mut hits: HashMap<&str, usize> = HashMap::with_capacity(total_logs);
+    lines
+        .par_iter()
+        .filter(|line| {
+            filter_matcher
+                .as_ref()
+                .map(|matcher| {
+                    let size = matcher.len();
+                    let number_of_matches = matcher.matches(&line).into_iter().count();
+
+                    number_of_matches == size
+                })
+                .unwrap_or(true)
+        })
+        .map(|line| {
+            selector_matcher
+                .captures(line)
+                .and_then(|capture| capture.get(2))
+                .map(|capture| capture.as_str())
+                .unwrap_or("<Missing Field>")
+        })
+        .collect::<Vec<&str>>()
+        .iter()
+        .for_each(|field| {
+            hits.entry(field)
+                .and_modify(|count| *count += 1)
+                .or_insert(1);
+        });
+
+    let grouping_end = grouping_start.elapsed().as_millis();
+
+    let print_start = Instant::now();
+
+    writeln!(&mut tw, "{}\tHits\tHit Percentage", selector).unwrap();
+    let hits: BTreeMap<usize, &str> = hits.into_par_iter().map(|(k, v)| (v, k)).collect();
+    for (count, field) in hits.iter().rev().take(max) {
         let percentage = (*count as f32 / total_logs as f32) * 100.0;
-        writeln!(&mut tw, "{}\t{}\t{:.3}%", domain, count, percentage).unwrap();
+        writeln!(&mut tw, "{}\t{}\t{:.3}%", field, count, percentage).unwrap();
     }
 
+    let print_end = print_start.elapsed().as_millis();
+
+    writeln!(&mut tw, "{} total logs", total_logs);
+    writeln!(&mut tw, "Reading took {}ms", read_end);
+    writeln!(&mut tw, "Grouping took {}ms", grouping_end);
+    writeln!(&mut tw, "Printing took {}ms", print_end);
     tw.flush().unwrap();
 }
