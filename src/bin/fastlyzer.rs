@@ -5,12 +5,16 @@ use structopt::StructOpt;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "fastlyzer")]
 struct Opt {
+    /// Max number of entries to display
     #[structopt(short = "m", long, default_value = "10")]
     max: usize,
+    /// The field in the logs which you want to count
     #[structopt(short = "s", long, default_value = "client_ip")]
     selector: String,
+    /// One or more key=value pairs to AND by when filtering the results
     #[structopt(short = "f", long)]
     filter: Option<Vec<String>>,
+    /// The log file to be analyzed
     #[structopt(short = "i", long)]
     input: String,
 }
