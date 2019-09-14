@@ -66,7 +66,7 @@ pub fn get_domains(
                 .or_insert(1);
         });
 
-    writeln!(&mut tw, "{}\tHits\tHit Percentage", selector).unwrap();
+    writeln!(&mut tw, "{}\tHits\tHit %", selector).unwrap();
     let hits: BTreeMap<usize, &str> = hits.into_par_iter().map(|(k, v)| (v, k)).collect();
     for (count, field) in hits.iter().rev().take(max) {
         let percentage = (*count as f32 / total_logs as f32) * 100.0;
