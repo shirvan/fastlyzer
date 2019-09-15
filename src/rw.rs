@@ -1,9 +1,9 @@
+use crate::FastResult;
 use std::{
     fs::OpenOptions,
     io::{BufRead, BufReader},
-    path::Path
+    path::Path,
 };
-use crate::FastResult;
 
 pub fn read(file: &str) -> FastResult<Box<dyn BufRead>> {
     let path = Path::new(file);
