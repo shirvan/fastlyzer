@@ -7,19 +7,20 @@ use std::{
 use concat_reader::concat_path;
 
 pub fn reader(file: &str) -> FastResult<Box<dyn BufRead>> {
-    let mut res = vec![];
     let path = Path::new(file);
     if path.is_dir() {
-        for file in path.read_dir() {
-            let mut paths = file
-                .into_iter()
-                .map(|f| f.unwrap().path())
-                .collect();
-
-            let mut f = concat_path(paths);
-            let mut con = BufReader::new(f);
-            Ok(Box::new(con))
-        }
+        let paths = path.read_dir()
+            .into_iter()
+            .map(|file| {
+                file.into_iter()
+                    .map(|f| f.unwrap().path())
+                    .collect::<Vec<_>>()
+            })
+            .flatten()
+            .collect::<Vec<_>>();
+        let mut f = concat_path(paths);
+        let mut con = BufReader::new(f);
+        Ok(Box::new(con))
     } else {
         let file = OpenOptions::new().read(true).open(&path)?;
         let buff = BufReader::new(file);
