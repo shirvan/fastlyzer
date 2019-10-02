@@ -12,15 +12,14 @@ pub fn reader(file: &str) -> FastResult<Box<dyn BufRead>> {
         let paths = path.read_dir()
             .into_iter()
             .map(|file| {
-                file.into_iter()
-                    .map(|f| f.unwrap().path())
+                file.map(|f| f.unwrap().path())
                     .collect::<Vec<_>>()
             })
             .flatten()
             .collect::<Vec<_>>();
-        let mut f = concat_path(paths);
-        let mut con = BufReader::new(f);
-        Ok(Box::new(con))
+        let file = concat_path(paths);
+        let buff = BufReader::new(file);
+        Ok(Box::new(buff))
     } else {
         let file = OpenOptions::new().read(true).open(&path)?;
         let buff = BufReader::new(file);
