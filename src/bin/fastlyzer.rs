@@ -1,5 +1,5 @@
 #![deny(rust_2018_idioms)]
-use fastlyzer::{get_domains, read, FastResult};
+use fastlyzer::{run, read, FastResult};
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
@@ -35,6 +35,6 @@ fn main() -> FastResult<()> {
                 .collect()
         })
         .unwrap_or_else(Vec::new);
-    get_domains(file, opt.max, &opt.selector, filters);
+    run(file, opt.max, &opt.selector, filters);
     Ok(())
 }

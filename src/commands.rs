@@ -6,7 +6,7 @@ use std::{
 use rayon::prelude::*;
 use tabwriter::TabWriter;
 
-pub fn get_domains(
+pub fn run(
     reader: Box<dyn BufRead>,
     max: usize,
     selector: &str,
