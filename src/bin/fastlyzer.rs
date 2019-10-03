@@ -14,7 +14,7 @@ struct Opt {
     /// One or more key=value pairs to AND by when filtering the results
     #[structopt(short = "f", long)]
     filter: Option<Vec<String>>,
-    /// The log file to be analyzed
+    /// The log file or directory to be analyzed
     #[structopt(short = "i", long)]
     input: String,
 }
