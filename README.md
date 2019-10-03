@@ -3,7 +3,7 @@
 A log reader and analyzer. 
 Originally designed to analyze Fastly logs but can be used for any log file containing one JSON entry per line.
 
-```
+```bash
 fastlyzer 0.1.0
 
 USAGE:
