@@ -1,7 +1,7 @@
 [package]
 name = "fastlyzer"
 version = "0.2.0"
-authors = ["Shirvan Salehipoor <shirvan.sa@gmail.com>", "Matt Freitas-Stavola <matt@edlio.com>"]
+authors = ["Shirvan Salehipoor <shirvan.sa@gmail.com>", "Matt Freitas-Stavola <matt@stavola.xyz>"]
 edition = "2018"
 description = "A fast JSON log analyzer."
 homepage = "https://github.com/shirvan/fastlyzer"
