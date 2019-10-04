@@ -1,10 +1,10 @@
 use failure::Fail;
 use std::io;
 
-/// Error variants
+/// Error variants.
 #[derive(Fail, Debug)]
 pub enum FastlyzerErr {
-    /// IO Errors
+    /// IO Errors.
     #[fail(display = "{}", _0)]
     Io(#[cause] io::Error),
 }
@@ -15,5 +15,5 @@ impl From<io::Error> for FastlyzerErr {
     }
 }
 
-/// Fastlyzer Result type
+/// Fastlyzer Result type alias.
 pub type FastResult<T> = std::result::Result<T, FastlyzerErr>;

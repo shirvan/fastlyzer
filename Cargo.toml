@@ -1,8 +1,20 @@
 [package]
 name = "fastlyzer"
-version = "0.1.0"
-authors = ["Shirvan Salehipoor <shirvan@edlio.com>"]
+version = "0.2.0"
+authors = ["Shirvan Salehipoor <shirvan.sa@gmail.com>", "Matt Freitas-Stavola <matt@stavola.xyz>"]
 edition = "2018"
+description = "A fast JSON log analyzer."
+homepage = "https://github.com/shirvan/fastlyzer"
+repository = "https://github.com/shirvan/fastlyzer"
+readme = "README.md"
+license = "Unlicense/MIT"
+keywords = ["logs", "analyzer", "fast"]
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = false
 
 [dependencies]
 rayon = "1.2.0"
