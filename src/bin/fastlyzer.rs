@@ -1,5 +1,5 @@
 #![deny(rust_2018_idioms)]
-use fastlyzer::{run, reader, FastResult};
+use fastlyzer::{reader, run, FastResult};
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
