@@ -5,7 +5,7 @@ summary: A log reader and analyzer
 description: |
   Originally designed to analyze Fastly logs but can be used for any log file containing one JSON entry per line.
 
-grade: devel
+grade: devel # change this to stable once we reach 1.0
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
 parts:
