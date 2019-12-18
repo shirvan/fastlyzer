@@ -1,0 +1,24 @@
+name: Snapcraft Publish
+
+on:
+  release:
+    types: [prereleased]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        with:
+          snapcraft_token: ${{ secrets.snapcraft_token }}
+
+      - name: Build snap
+        run: snapcraft
+
+      - name: Push snap
+        run: snapcraft push fastlyzer_*_amd64.snap --release edge
