@@ -1,4 +1,4 @@
-name: Snapcraft Publish
+name: Snapcraft Publish (Edge Channel)
 
 on:
   release:
